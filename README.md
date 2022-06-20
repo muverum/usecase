@@ -6,6 +6,8 @@ I've found that in the world of REST API building, the [swaggest/rest](https://g
 2. Built around clean architecture concepts
 3. Self documenting to a swagger document
 
+tldr: An exmaple service using the `UseCase` layer can be see in `/example`
+
 ## Sharp Edges
 
 I recently used the library to build an administrative API at work and ran into the fundamental problem. Let's say you

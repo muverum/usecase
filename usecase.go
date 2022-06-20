@@ -44,12 +44,14 @@ func (i UseCase[I, O]) interactor() usecase.Interact {
 		// Now we'll generate a _new function_ based off of the middlewares
 		outContext := ctx
 		var outFn = func(ctx context.Context, input I, output O) error {
-			for index := len(i.middleware) - 1; index >= 0; index-- {
+
+			for _, v := range i.middleware {
 				var err error
-				if outContext, err = i.middleware[index](outContext, input, output); err != nil {
+				if outContext, err = v(outContext, input, output); err != nil {
 					return err
 				}
 			}
+			
 			return i.usecase(outContext, in, out)
 		}
 

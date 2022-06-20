@@ -22,6 +22,10 @@ type UseCase[I any, O any] struct {
 	apiDecorationFunc func(IOInteractor *usecase.IOInteractor)
 }
 
+func (i UseCase[I, O]) Use(middlewares ...Middleware[I, O]) {
+	i.middleware = append(i.middleware, middlewares...)
+}
+
 // interactor is a thin layer wrapping the generic around the interface expected by the underlying library
 func (i UseCase[I, O]) interactor() usecase.Interact {
 	return func(ctx context.Context, input, output interface{}) error {

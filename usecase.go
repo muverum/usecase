@@ -3,7 +3,9 @@ package usecase
 import (
 	"context"
 	"errors"
+	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/usecase"
+	"net/http"
 )
 
 type UseCaseFunc[I any, O any] func(ctx context.Context, input I, output O) error
@@ -24,6 +26,12 @@ type UseCase[I any, O any] struct {
 
 func (i UseCase[I, O]) Use(middlewares ...Middleware[I, O]) {
 	i.middleware = append(i.middleware, middlewares...)
+}
+
+// Handler is used to take an existing usecase and make it available for
+// use with sub routers using chi.
+func (i UseCase[I, O]) Handler() http.Handler {
+	return nethttp.NewHandler(i.Interactor())
 }
 
 // interactor is a thin layer wrapping the generic around the interface expected by the underlying library
@@ -51,7 +59,7 @@ func (i UseCase[I, O]) interactor() usecase.Interact {
 					return err
 				}
 			}
-			
+
 			return i.usecase(outContext, in, out)
 		}
 

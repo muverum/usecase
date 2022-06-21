@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	usecase2 "github.com/muverum/usecase/example/internal/usecase"
 	"github.com/swaggest/openapi-go/openapi3"
+	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/rest/openapi"
 	"github.com/swaggest/rest/response/gzip"
 	"github.com/swaggest/rest/web"
@@ -75,7 +76,15 @@ func main() {
 	//listed here, but don't make sense to add everywhere?
 
 	// In this usecase constructor we actually set middleware
-	apiService.Get("/dog/walk/{place}/{times}", usecase2.MakeDogWalkUseCase(log.New(os.Stdout, "DOG-", 0)).Interactor())
+	apiService.Route("/dog", func(r chi.Router) {
+		r.Use(nethttp.AnnotateOpenAPI(apiService.OpenAPICollector, func(op *openapi3.Operation) error {
+			op.Tags = []string{"Dogs"}
+
+			return nil
+		}))
+
+		r.Method(http.MethodGet, "/walk/{place}/{times}", usecase2.MakeDogWalkUseCase(log.New(os.Stdout, "DOG-", 0)).Handler())
+	})
 
 	Docs(swagger, "/swagger", swgui.New, apiService.OpenAPICollector, apiService.OpenAPI)
 

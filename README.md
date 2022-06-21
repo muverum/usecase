@@ -53,11 +53,14 @@ func MakeCatUsecase() (usecase.UseCase[ConcatenateRequest, *ConcatenateResponse]
 
 	return usecase.New(ConcatenateRequest{}, &ConcatenateResponse{}, catUseCase(), decorationFunc)
 }
-
 ```
 
-These can then be returned as either an `Interactor()` for use with the swaggest/rest library or as a 
+These can then be returned as either an `Interactor()` for use with the swaggest/rest library or as a
 `Handler()` for anything that takes an `http.Handler` like go-chi's `Method`
+
+## Notes about `New`
+New was updated to provide an error on call if the provided output is _not_ a pointer. This is because the expectation
+down the stack is that a pointer will be provided for the interactor to action (as well as various middlewares)
 
 # SubRouting
 [Working with the developer](https://github.com/swaggest/rest/issues/84) it was apparent that `Mount` was a can of 

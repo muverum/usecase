@@ -6,6 +6,7 @@ import (
 	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/usecase"
 	"net/http"
+	"reflect"
 )
 
 type UseCaseFunc[I any, O any] func(ctx context.Context, input I, output O) error
@@ -77,12 +78,16 @@ func (i UseCase[I, O]) Interactor() usecase.Interactor {
 	return u
 }
 
-func New[I any, O any](input I, output O, interactor UseCaseFunc[I, O], decorationFunc func(IOInteractor *usecase.IOInteractor), m ...Middleware[I, O]) UseCase[I, O] {
+func New[I any, O any](input I, output O, interactor UseCaseFunc[I, O], decorationFunc func(IOInteractor *usecase.IOInteractor), m ...Middleware[I, O]) (UseCase[I, O], error) {
+	//Check to make sure the Output is a pointer type
+	if reflect.ValueOf(output).Kind() != reflect.Ptr {
+		return UseCase[I, O]{}, errors.New("a pointer type must be provided as your output type for the interaction to apply it correctly")
+	}
 	return UseCase[I, O]{
 		input:             input,
 		output:            output,
 		usecase:           interactor,
 		apiDecorationFunc: decorationFunc,
 		middleware:        m,
-	}
+	}, nil
 }

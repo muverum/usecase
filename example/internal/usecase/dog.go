@@ -55,7 +55,7 @@ func dogWalkUseCase() usecase.UseCaseFunc[DogWalkRequest, *DogWalkResponse] {
 	}
 }
 
-func MakeDogWalkUseCase(logger *log.Logger) usecase.UseCase[DogWalkRequest, *DogWalkResponse] {
+func MakeDogWalkUseCase(logger *log.Logger) (usecase.UseCase[DogWalkRequest, *DogWalkResponse], error) {
 
 	var decorationFunc = func(i *usecase2.IOInteractor) {
 		i.SetTags("dog")

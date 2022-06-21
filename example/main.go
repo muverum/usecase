@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/muverum/usecase"
 	usecase2 "github.com/muverum/usecase/example/internal/usecase"
 	"github.com/swaggest/openapi-go/openapi3"
 	"github.com/swaggest/rest/nethttp"
@@ -70,7 +71,12 @@ func main() {
 	}
 
 	//We first build a use case and from it extract an interactor to hand to the router
-	apiService.Post("/cat", usecase2.MakeCatUsecase().Interactor())
+	var catUseCase usecase.UseCase[usecase2.ConcatenateRequest, *usecase2.ConcatenateResponse]
+	var err error
+	if catUseCase, err = usecase2.MakeCatUsecase(); err != nil {
+		log.Fatal(err.Error())
+	}
+	apiService.Post("/cat", catUseCase.Interactor())
 
 	//What if we need a new subset of functionality that needs additional commonalities (besides) the middlewares
 	//listed here, but don't make sense to add everywhere?
@@ -83,7 +89,12 @@ func main() {
 			return nil
 		}))
 
-		r.Method(http.MethodGet, "/walk/{place}/{times}", usecase2.MakeDogWalkUseCase(log.New(os.Stdout, "DOG-", 0)).Handler())
+		var dogUseCase usecase.UseCase[usecase2.DogWalkRequest, *usecase2.DogWalkResponse]
+		if dogUseCase, err = usecase2.MakeDogWalkUseCase(log.New(os.Stdout, "DOG-", 0)); err != nil {
+			log.Fatal(err.Error())
+		}
+
+		r.Method(http.MethodGet, "/walk/{place}/{times}", dogUseCase.Handler())
 	})
 
 	Docs(swagger, "/swagger", swgui.New, apiService.OpenAPICollector, apiService.OpenAPI)

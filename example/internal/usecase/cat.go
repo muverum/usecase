@@ -28,7 +28,7 @@ func catUseCase() usecase.UseCaseFunc[ConcatenateRequest, *ConcatenateResponse] 
 	}
 }
 
-func MakeCatUsecase() usecase.UseCase[ConcatenateRequest, *ConcatenateResponse] {
+func MakeCatUsecase() (usecase.UseCase[ConcatenateRequest, *ConcatenateResponse], error) {
 	var decorationFunc = func(i *usecase2.IOInteractor) {
 		i.SetTags("cat")
 		i.SetTitle("Concatenate your request")

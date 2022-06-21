@@ -75,7 +75,7 @@ func main() {
 	//What if we need a new subset of functionality that needs additional commonalities (besides) the middlewares
 	//listed here, but don't make sense to add everywhere?
 
-	// In this usecase constructor we actually set middleware
+	// Set a subrouter that will use its own middleware (specifically the annotation for the parent collector
 	apiService.Route("/dog", func(r chi.Router) {
 		r.Use(nethttp.AnnotateOpenAPI(apiService.OpenAPICollector, func(op *openapi3.Operation) error {
 			op.Tags = []string{"Dogs"}

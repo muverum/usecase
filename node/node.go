@@ -45,11 +45,12 @@ func (a *Node) Use(middleware ...func(next http.Handler) http.Handler) {
 
 func (a *Node) Routes() string {
 	sb := strings.Builder{}
+	sb.WriteString("\n")
 	sb.WriteString(a.Root)
 	sb.WriteString("\n")
 	for route, v := range a.Tree {
 		for verb, _ := range v {
-			sb.WriteString(fmt.Sprintf("\t%s\t%s", verb, route))
+			sb.WriteString(fmt.Sprintf("\t%s\t%s\n", route, verb))
 		}
 	}
 

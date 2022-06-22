@@ -15,6 +15,8 @@ func main() {
 
 	api := api2.New(3001, 3000)
 
+	logger := log.New(os.Stdout, "EXAMPLE-", 0)
+
 	//Build use case for top-level mount
 	var catUseCase usecase.UseCase[usecase2.ConcatenateRequest, *usecase2.ConcatenateResponse]
 	var err error
@@ -29,14 +31,18 @@ func main() {
 	}
 
 	//Build a new node
-	dognode, err := dog.New(api.Server, log.New(os.Stdout, "DOG-", 0))
+	dognode, err := dog.New(api.Server, logger)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
+	//logger.Print(dognode.Routes())
+
 	api.Nodes = []*node.Node{
 		dognode,
 	}
+
+	logger.Println(api.Routes())
 
 	_ = api.Listen()
 }

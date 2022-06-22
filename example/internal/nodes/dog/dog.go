@@ -16,6 +16,11 @@ func New(service *web.Service, logger *log.Logger) (*node.Node, error) {
 		return nil, err
 	}
 
+	var dogFeedUseCase usecase.UseCase[usecase2.DogFeedRequest, *usecase2.DogFeedResponse]
+	if dogFeedUseCase, err = usecase2.MakeDogFeedUseCase(); err != nil {
+		return nil, err
+	}
+
 	n := node.New(service)
 	n.Root = "/dog"
 	n.Tags = []string{
@@ -25,6 +30,9 @@ func New(service *web.Service, logger *log.Logger) (*node.Node, error) {
 	n.Tree = map[node.Route]map[string]node.Handler{
 		"/walk/{place}/{times}": {
 			http.MethodGet: dogUseCase,
+		},
+		"/feed": {
+			http.MethodPost: dogFeedUseCase,
 		},
 	}
 

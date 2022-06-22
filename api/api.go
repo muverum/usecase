@@ -34,6 +34,29 @@ func Docs(s chi.Router, pattern string, swgui func(title, schemaURL, basePath st
 	s.Mount(pattern, swgui(spec.Info.Title, pattern+"/openapi.json", pattern))
 }
 
+func (a *API) Routes() string {
+	sb := strings.Builder{}
+	sb.WriteString("\n")
+
+	//Top Level Routes first
+	sb.WriteString("-----Top Level Routes -----\n")
+	for route, actionMap := range a.Actions {
+		for verb, _ := range actionMap {
+			sb.WriteString(fmt.Sprintf("%s\t%s", route, verb))
+		}
+	}
+
+	sb.WriteString("\n\n")
+
+	//Mounted Nodes
+	sb.WriteString("----- Mounted Nodes -----\n")
+	for _, v := range a.Nodes {
+		sb.WriteString(v.Routes())
+	}
+
+	return sb.String()
+}
+
 func New(apiPort int, swaggerPort int, options ...func(s *web.Service, initialized bool)) *API {
 
 	server := web.DefaultService(options...)
@@ -66,7 +89,7 @@ func (a *API) Listen() error {
 			a.Server.Method(method, route, h.Handler())
 		}
 	}
-	
+
 	r := chi.NewRouter()
 	Docs(r, "/swagger", swgui.New, a.Server.OpenAPICollector, a.Server.OpenAPI)
 

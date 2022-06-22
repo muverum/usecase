@@ -94,23 +94,6 @@ A node consists of:
 New was updated to provide an error on call if the provided output is _not_ a pointer. This is because the expectation
 down the stack is that a pointer will be provided for the interactor to action (as well as various middlewares)
 
-# SubRouting
-[Working with the developer](https://github.com/swaggest/rest/issues/84) it was apparent that `Mount` was a can of 
-worms unto itself. The author did point out that the `Route` methods did work
-
-```go
-// Set a subrouter that will use its own middleware (specifically the annotation for the parent collector
-apiService.Route("/dog", func(r chi.Router) {
-    r.Use(nethttp.AnnotateOpenAPI(apiService.OpenAPICollector, func(op *openapi3.Operation) error {
-        op.Tags = []string{"Dogs"}
-
-        return nil
-    }))
-
-    r.Method(http.MethodGet, "/walk/{place}/{times}", usecase2.MakeDogWalkUseCase(log.New(os.Stdout, "DOG-", 0)).Handler())
-})
-```
-
 ## Handler Method
 In order to conform to the go-chi `Method` signature, we had to provide a `http.Handler`. This was relatively easy
 since the `nethttp` library provided a new handler function for the interactor, so we just build the interactor

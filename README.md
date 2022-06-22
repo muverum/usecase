@@ -58,6 +58,38 @@ func MakeCatUsecase() (usecase.UseCase[ConcatenateRequest, *ConcatenateResponse]
 These can then be returned as either an `Interactor()` for use with the swaggest/rest library or as a
 `Handler()` for anything that takes an `http.Handler` like go-chi's `Method`
 
+# API and Node Types
+An API type was added to this library to be a _struct-based_ representation of your API. It can contain:
+
+## API
+
+The `API` is to be understood as the top level definition of your API and will
+run on two separate ports when `.Listen()` is invoked. One will expose the openapi
+UI, while the other will expose the API's routes.
+
+* Server: The `*web.Service` from swaggest. This is the foundation at the root
+* Nodes: A slice of Nodes which are mounted to the API at `Listen`
+* Actions:  Map of routs to a map of strings (HTTP Methods) to Usecases that are to be mounted at the top level 
+  (doesn't warrant a sub node)
+* Middleware: any http middleware to apply at the 
+* Wraps: any http handlers to use as swaggest would use the `wrap` method. Gzip is common
+* Ports: The ports on which to listen for the API application and the swagger listener
+
+## Node
+
+A `Node` is thought of as any chunk of subroutes that needs to be separated from
+the root, whether it's because of a common route path or a need for common (but separate)
+middleware from the API layer itself. 
+
+A node consists of:
+
+* Root: The root point at which it will mount to the `API`
+* Tags: Slice of strings which are applied to the openapi middleware
+* service: Pointer to the `web.Service` from rest handled by the API
+* Middleware: Slice of middlewares to be applied for all interactions on this node
+* DefaultOptions: If no `Options` are defined in the `Tree`, this will be applied if present
+* Tree: Map of routes to another map of string (http verb) and then `UseCase`
+
 ## Notes about `New`
 New was updated to provide an error on call if the provided output is _not_ a pointer. This is because the expectation
 down the stack is that a pointer will be provided for the interactor to action (as well as various middlewares)

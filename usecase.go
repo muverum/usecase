@@ -35,6 +35,10 @@ func (i UseCase[I, O]) Handler() http.Handler {
 	return nethttp.NewHandler(i.Interactor())
 }
 
+type Interactor interface {
+	Interactor() usecase.Interactor
+}
+
 // interactor is a thin layer wrapping the generic around the interface expected by the underlying library
 func (i UseCase[I, O]) interactor() usecase.Interact {
 	return func(ctx context.Context, input, output interface{}) error {

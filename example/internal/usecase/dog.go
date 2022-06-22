@@ -81,3 +81,28 @@ func MakeDogWalkUseCase(logger *log.Logger) (usecase.UseCase[DogWalkRequest, *Do
 
 	return usecase.New(DogWalkRequest{}, &DogWalkResponse{}, dogWalkUseCase(), decorationFunc, middleware...)
 }
+
+// Dog Feed
+type DogFeedRequest struct {
+	Bowls int `json:"bowls" required:"true"`
+}
+
+type DogFeedResponse struct {
+	Happy bool `json:"happy"`
+}
+
+func dogFeed(ctx context.Context, input DogFeedRequest, output *DogFeedResponse) error {
+	output.Happy = input.Bowls >= 2
+	return nil
+}
+
+func MakeDogFeedUseCase() (usecase.UseCase[DogFeedRequest, *DogFeedResponse], error) {
+
+	decorator := func(i *usecase2.IOInteractor) {
+		i.SetTags("dog")
+		i.SetTitle("FeedDog")
+		i.SetDescription("Feeds the dog X times and sees if it's happy")
+	}
+
+	return usecase.New(DogFeedRequest{}, &DogFeedResponse{}, dogFeed, decorator)
+}

@@ -2,7 +2,7 @@ package dog
 
 import (
 	"github.com/muverum/usecase"
-	usecase2 "github.com/muverum/usecase/example/internal/usecase"
+	usecase2 "github.com/muverum/usecase/example/usecase"
 	"github.com/muverum/usecase/node"
 	"github.com/swaggest/rest/web"
 	"log"

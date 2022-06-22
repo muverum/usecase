@@ -78,8 +78,7 @@ func New(apiPort int, swaggerPort int, options ...func(s *web.Service, initializ
 	}
 }
 
-func (a *API) Listen() error {
-
+func (a *API) MountRoutes() error {
 	a.Server.Wrap(a.Wraps...)
 	a.Server.Use(a.Middleware...)
 
@@ -90,15 +89,26 @@ func (a *API) Listen() error {
 		}
 	}
 
-	r := chi.NewRouter()
-	Docs(r, "/swagger", swgui.New, a.Server.OpenAPICollector, a.Server.OpenAPI)
-
+	//Mount Child Routes
 	var err error
 	for _, v := range a.Nodes {
 		if err = v.Mount(); err != nil {
 			return err
 		}
 	}
+
+	return nil
+}
+
+func (a *API) Listen() error {
+
+	var err error
+	if err = a.MountRoutes(); err != nil {
+		return err
+	}
+
+	r := chi.NewRouter()
+	Docs(r, "/swagger", swgui.New, a.Server.OpenAPICollector, a.Server.OpenAPI)
 	go func() {
 		_ = http.ListenAndServe(fmt.Sprintf(":%d", a.Ports.Swagger), r)
 	}()

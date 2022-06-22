@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/muverum/usecase"
 	api2 "github.com/muverum/usecase/api"
-	"github.com/muverum/usecase/example/internal/nodes/dog"
-	usecase2 "github.com/muverum/usecase/example/internal/usecase"
+	"github.com/muverum/usecase/example/nodes/dog"
+	usecase2 "github.com/muverum/usecase/example/usecase"
 	"github.com/muverum/usecase/node"
 	"log"
 	"net/http"

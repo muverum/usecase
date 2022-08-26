@@ -199,7 +199,7 @@ func TestNewWithoutPointer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := New(tt.args.input, tt.args.output, tt.args.interactor, tt.args.decorationFunc, tt.args.m...)
+			_, err := New(tt.args.input, tt.args.output, tt.args.interactor, tt.args.decorationFunc, nil, tt.args.m...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -242,7 +242,7 @@ func TestNewWithPointer(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := New(tt.args.input, tt.args.output, tt.args.interactor, tt.args.decorationFunc, tt.args.m...)
+			_, err := New(tt.args.input, tt.args.output, tt.args.interactor, tt.args.decorationFunc, nil, tt.args.m...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return

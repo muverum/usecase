@@ -36,8 +36,6 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	//logger.Print(dognode.Routes())
-
 	api.Nodes = []*node.Node{
 		dognode,
 	}

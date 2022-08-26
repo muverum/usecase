@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"github.com/muverum/usecase/log"
 	"github.com/swaggest/rest/nethttp"
 	"github.com/swaggest/usecase"
 	"net/http"
@@ -18,6 +19,7 @@ type Middleware[I any, O any] func(ctx context.Context, input I, output O) (cont
 type UseCase[I any, O any] struct {
 	input   I
 	output  O
+	logger  log.UseCaseLogger
 	usecase UseCaseFunc[I, O]
 	// Middleware are to be wrapped during the interaction phase such that they are executed in order
 	// before the actual use case func is called.
@@ -61,6 +63,9 @@ func (i UseCase[I, O]) interactor() usecase.Interact {
 			for _, v := range i.middleware {
 				var err error
 				if outContext, err = v(outContext, input, output); err != nil {
+					if i.logger != nil {
+						i.logger.Log(err.Error())
+					}
 					return err
 				}
 			}
@@ -68,7 +73,13 @@ func (i UseCase[I, O]) interactor() usecase.Interact {
 			return i.usecase(outContext, in, out)
 		}
 
-		return outFn(outContext, in, out)
+		err := outFn(outContext, in, out)
+
+		if err != nil && i.logger != nil {
+			i.logger.Log(err.Error())
+		}
+
+		return err
 	}
 }
 
@@ -82,7 +93,14 @@ func (i UseCase[I, O]) Interactor() usecase.Interactor {
 	return u
 }
 
-func New[I any, O any](input I, output O, interactor UseCaseFunc[I, O], decorationFunc func(IOInteractor *usecase.IOInteractor), m ...Middleware[I, O]) (UseCase[I, O], error) {
+func New[I any, O any](input I,
+	output O,
+	interactor UseCaseFunc[I, O],
+	decorationFunc func(IOInteractor *usecase.IOInteractor),
+	logger log.UseCaseLogger,
+	m ...Middleware[I, O],
+) (UseCase[I, O], error) {
+
 	//Check to make sure the Output is a pointer type
 	if reflect.ValueOf(output).Kind() != reflect.Ptr {
 		return UseCase[I, O]{}, errors.New("a pointer type must be provided as your output type for the interaction to apply it correctly")
@@ -93,5 +111,6 @@ func New[I any, O any](input I, output O, interactor UseCaseFunc[I, O], decorati
 		usecase:           interactor,
 		apiDecorationFunc: decorationFunc,
 		middleware:        m,
+		logger:            logger,
 	}, nil
 }

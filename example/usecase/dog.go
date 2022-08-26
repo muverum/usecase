@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"github.com/muverum/usecase"
+	log2 "github.com/muverum/usecase/log"
 	usecase2 "github.com/swaggest/usecase"
 	"log"
 )
@@ -13,7 +14,7 @@ type DogWalkRequest struct {
 	Times int      `json:"times" path:"times" description:"The number of times to walk said dog"`
 }
 
-//Not expecting anything so a 204 is ok
+// Not expecting anything so a 204 is ok
 type DogWalkResponse struct {
 	Walked bool `json:"walked"`
 	Times  int  `json:"times"`
@@ -55,7 +56,7 @@ func dogWalkUseCase() usecase.UseCaseFunc[DogWalkRequest, *DogWalkResponse] {
 	}
 }
 
-func MakeDogWalkUseCase(logger *log.Logger) (usecase.UseCase[DogWalkRequest, *DogWalkResponse], error) {
+func MakeDogWalkUseCase(logger *log.Logger, l2 log2.UseCaseLogger) (usecase.UseCase[DogWalkRequest, *DogWalkResponse], error) {
 
 	var decorationFunc = func(i *usecase2.IOInteractor) {
 		i.SetTags("dog")
@@ -79,7 +80,7 @@ func MakeDogWalkUseCase(logger *log.Logger) (usecase.UseCase[DogWalkRequest, *Do
 		Per request
 	*/
 
-	return usecase.New(DogWalkRequest{}, &DogWalkResponse{}, dogWalkUseCase(), decorationFunc, middleware...)
+	return usecase.New(DogWalkRequest{}, &DogWalkResponse{}, dogWalkUseCase(), decorationFunc, l2, middleware...)
 }
 
 // Dog Feed
@@ -96,7 +97,7 @@ func dogFeed(ctx context.Context, input DogFeedRequest, output *DogFeedResponse)
 	return nil
 }
 
-func MakeDogFeedUseCase() (usecase.UseCase[DogFeedRequest, *DogFeedResponse], error) {
+func MakeDogFeedUseCase(logger log2.UseCaseLogger) (usecase.UseCase[DogFeedRequest, *DogFeedResponse], error) {
 
 	decorator := func(i *usecase2.IOInteractor) {
 		i.SetTags("dog")
@@ -104,5 +105,5 @@ func MakeDogFeedUseCase() (usecase.UseCase[DogFeedRequest, *DogFeedResponse], er
 		i.SetDescription("Feeds the dog X times and sees if it's happy")
 	}
 
-	return usecase.New(DogFeedRequest{}, &DogFeedResponse{}, dogFeed, decorator)
+	return usecase.New(DogFeedRequest{}, &DogFeedResponse{}, dogFeed, decorator, logger)
 }

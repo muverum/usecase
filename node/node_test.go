@@ -82,7 +82,7 @@ func ptr[I any](input I) *I {
 }
 
 func TestNode_Routes(tt *testing.T) {
-	uc1, _ := usecase.New[string, *string]("", ptr(""), func(ctx context.Context, input string, output *string) error { return nil }, nil)
+	uc1, _ := usecase.New[string, *string]("", ptr(""), func(ctx context.Context, input string, output *string) error { return nil }, nil, nil)
 
 	type fields struct {
 		Root           string

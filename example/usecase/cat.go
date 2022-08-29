@@ -35,5 +35,5 @@ func MakeCatUsecase() (usecase.UseCase[ConcatenateRequest, *ConcatenateResponse]
 		i.SetDescription("Concatenates your request data with a fixed string")
 	}
 
-	return usecase.New(ConcatenateRequest{}, &ConcatenateResponse{}, catUseCase(), decorationFunc)
+	return usecase.New(ConcatenateRequest{}, &ConcatenateResponse{}, catUseCase(), decorationFunc, nil)
 }

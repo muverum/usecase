@@ -3,8 +3,10 @@ package usecase
 import (
 	"context"
 	"errors"
+	"github.com/muverum/usecase/decoders"
 	"github.com/muverum/usecase/log"
 	"github.com/swaggest/rest/nethttp"
+	"github.com/swaggest/rest/response"
 	"github.com/swaggest/usecase"
 	"net/http"
 	"reflect"
@@ -24,6 +26,8 @@ type UseCase[I any, O any] struct {
 	// Middleware are to be wrapped during the interaction phase such that they are executed in order
 	// before the actual use case func is called.
 	middleware        []Middleware[I, O]
+	decoder           nethttp.RequestDecoder
+	encoder           nethttp.ResponseEncoder
 	apiDecorationFunc func(IOInteractor *usecase.IOInteractor)
 }
 
@@ -34,7 +38,20 @@ func (i UseCase[I, O]) Use(middlewares ...Middleware[I, O]) {
 // Handler is used to take an existing usecase and make it available for
 // use with sub routers using chi.
 func (i UseCase[I, O]) Handler() http.Handler {
-	return nethttp.NewHandler(i.Interactor())
+	handler := nethttp.NewHandler(i.Interactor())
+
+	if i.decoder == nil {
+		i.decoder = &decoders.JsonDecoder{}
+	}
+
+	if i.encoder == nil {
+		i.encoder = &response.Encoder{}
+	}
+
+	handler.SetRequestDecoder(i.decoder)
+	handler.SetResponseEncoder(i.encoder)
+
+	return handler
 }
 
 type Interactor interface {

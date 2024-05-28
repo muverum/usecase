@@ -7,6 +7,7 @@ import (
 	"github.com/muverum/usecase/example/nodes/dog"
 	usecase2 "github.com/muverum/usecase/example/usecase"
 	"github.com/muverum/usecase/node"
+	"github.com/swaggest/openapi-go/openapi31"
 	"io"
 	"log"
 	"net/http"
@@ -17,7 +18,7 @@ import (
 )
 
 func testServer() *httptest.Server {
-	api := New(3001, 3000)
+	api := New(3001, 3000, openapi31.NewReflector())
 
 	logger := log.New(os.Stdout, "EXAMPLE-", 0)
 

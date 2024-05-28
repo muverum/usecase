@@ -23,8 +23,18 @@ type UseCase[I any, O any] struct {
 	usecase UseCaseFunc[I, O]
 	// Middleware are to be wrapped during the interaction phase such that they are executed in order
 	// before the actual use case func is called.
-	middleware        []Middleware[I, O]
-	apiDecorationFunc func(IOInteractor *usecase.IOInteractor)
+	middleware          []Middleware[I, O]
+	apiDecorationFunc   func(IOInteractor *usecase.IOInteractor)
+	statusCode          *int
+	expectedStatusCodes []int
+}
+
+func (i UseCase[I, O]) SetHttpStatus(code int) {
+	i.statusCode = &code
+}
+
+func (i UseCase[I, O]) SetExpectedStatusCodes(codes []int) {
+	i.expectedStatusCodes = codes
 }
 
 func (i UseCase[I, O]) Use(middlewares ...Middleware[I, O]) {
@@ -90,6 +100,11 @@ func (i UseCase[I, O]) Interactor() usecase.Interactor {
 	if i.apiDecorationFunc != nil {
 		i.apiDecorationFunc(pu)
 	}
+
+	//Process configurable codes
+	if i.statusCode != nil {
+	}
+
 	return u
 }
 

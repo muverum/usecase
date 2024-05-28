@@ -5,6 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/muverum/usecase/node"
+	oapi "github.com/swaggest/openapi-go"
 	"github.com/swaggest/openapi-go/openapi3"
 	"github.com/swaggest/rest/openapi"
 	"github.com/swaggest/rest/response/gzip"
@@ -57,9 +58,9 @@ func (a *API) Routes() string {
 	return sb.String()
 }
 
-func New(apiPort int, swaggerPort int, options ...func(s *web.Service, initialized bool)) *API {
+func New(apiPort int, swaggerPort int, reflector oapi.Reflector) *API {
 
-	server := web.DefaultService(options...)
+	server := web.NewService(reflector)
 
 	return &API{
 		Server: server,

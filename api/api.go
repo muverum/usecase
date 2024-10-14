@@ -79,8 +79,13 @@ func New(apiPort int, swaggerPort int, options ...func(s *web.Service, initializ
 }
 
 func (a *API) MountRoutes() error {
-	a.Server.Wrap(a.Wraps...)
-	a.Server.Use(a.Middleware...)
+	if len(a.Wraps) > 0 {
+		a.Server.Wrap(a.Wraps...)
+	}
+
+	if len(a.Middleware) > 0 {
+		a.Server.Use(a.Middleware...)
+	}
 
 	//Mount top level actions
 	for route, v := range a.Actions {
